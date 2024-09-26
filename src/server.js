@@ -1,26 +1,21 @@
 const express = require("express");
-const sequelize = require("./configs/config");
+const bodyParser = require("body-parser");
+const sequelize = require("./config/config");
+
+// Importando as rotas
+const eventoRoutes = require("./router/evento");
+const participanteRoutes = require("./router/participante");
+
 const app = express();
 
-require("dotenv").config();
+app.use(bodyParser.json());
+app.use("/evento", eventoRoutes);
+app.use("/participante", participanteRoutes);
 
-sequelize
-  .authenticate()
-
-  .then(() => {
-    console.log("Conexão estabelecida com sucesso!");
-    return sequelize.sync();
-  })
-  .then(() => {
-    app.listen(
-      (process.env.PORT = null ? 8080 : process.env.PORT),
-      (req, res) => {
-        console.log(
-          "O server está rodando na porta 8080. http://127.0.0.1:8080"
-        );
-      }
-    );
-  })
-  .catch((error) => {
-    console.error("Erro ao se conectar com o banco: ", error);
+// Sincronizando o banco de dados
+sequelize.sync().then(() => {
+  console.log("Banco de dados sincronizado");
+  app.listen(3000, () => {
+    console.log("Servidor rodando na porta 3000");
   });
+});
